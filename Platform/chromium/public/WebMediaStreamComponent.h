@@ -28,51 +28,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
+#ifndef WebMediaStreamComponent_h
+#define WebMediaStreamComponent_h
 
 #include "WebCommon.h"
+#include "WebNonCopyable.h"
+#include "WebPrivatePtr.h"
+
+namespace WebCore {
+class MediaStreamComponent;
+}
 
 namespace WebKit {
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
-class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
-class WebPeerConnectionHandlerClient;
-class WebURLLoader;
+class WebMediaStreamSource;
+class WebString;
 
-class Platform {
+class WebMediaStreamComponent {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    WebMediaStreamComponent() { }
+    ~WebMediaStreamComponent() { reset(); }
 
-    // Network -------------------------------------------------------------
+    WEBKIT_EXPORT void reset();
+    bool isNull() const { return m_private.isNull(); }
 
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
+    WEBKIT_EXPORT WebMediaStreamSource source() const;
+    WEBKIT_EXPORT bool isEnabled() const;
 
-    // WebRTC ----------------------------------------------------------
+#if WEBKIT_IMPLEMENTATION
+    WebMediaStreamComponent(WebCore::MediaStreamComponent*);
+    WebMediaStreamComponent& operator=(WebCore::MediaStreamComponent*);
+    operator WTF::PassRefPtr<WebCore::MediaStreamComponent>() const;
+    operator WebCore::MediaStreamComponent*() const;
+#endif
 
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
-
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
-
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
-
-protected:
-    ~Platform() { }
+private:
+    WebPrivatePtr<WebCore::MediaStreamComponent> m_private;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebMediaStreamComponent_h

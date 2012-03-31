@@ -28,51 +28,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
+#ifndef WebICEOptions_h
+#define WebICEOptions_h
 
 #include "WebCommon.h"
+#include "WebNonCopyable.h"
+#include "WebPrivatePtr.h"
+
+namespace WebCore {
+class IceOptions;
+}
 
 namespace WebKit {
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
-class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
-class WebPeerConnectionHandlerClient;
-class WebURLLoader;
+class WebString;
 
-class Platform {
+class WebICEOptions {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    enum CandidateType {
+        CandidateTypeAll,
+        CandidateTypeNoRelay,
+        CandidateTypeOnlyRelay,
+    };
 
-    // Network -------------------------------------------------------------
+    WebICEOptions() { }
+    WebICEOptions(const WebICEOptions& other) { assign(other); }
+    ~WebICEOptions() { reset(); }
 
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
+    WebICEOptions& operator=(const WebICEOptions& other)
+    {
+        assign(other);
+        return *this;
+    }
 
-    // WebRTC ----------------------------------------------------------
+    WEBKIT_EXPORT void assign(const WebICEOptions&);
 
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
+    WEBKIT_EXPORT void initialize(CandidateType);
+    WEBKIT_EXPORT void reset();
+    bool isNull() const { return m_private.isNull(); }
 
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
+    WEBKIT_EXPORT CandidateType candidateTypeToUse() const;
 
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
+#if WEBKIT_IMPLEMENTATION
+    WebICEOptions(const WTF::PassRefPtr<WebCore::IceOptions>&);
+#endif
 
-protected:
-    ~Platform() { }
+private:
+    WebPrivatePtr<WebCore::IceOptions> m_private;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebICEOptions_h

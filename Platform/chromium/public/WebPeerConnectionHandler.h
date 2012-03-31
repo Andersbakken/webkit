@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Google Inc. All rights reserved.
+ * Copyright (C) 2011 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,51 +28,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
+#ifndef WebPeerConnectionHandler_h
+#define WebPeerConnectionHandler_h
 
-#include "WebCommon.h"
+#include "WebString.h"
+#include "WebVector.h"
 
 namespace WebKit {
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
-class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
+class WebMediaStreamDescriptor;
 class WebPeerConnectionHandlerClient;
-class WebURLLoader;
 
-class Platform {
+// Note:
+// SDP stands for Session Description Protocol, which is intended for describing
+// multimedia sessions for the purposes of session announcement, session
+// invitation, and other forms of multimedia session initiation.
+//
+// More information can be found here:
+// http://tools.ietf.org/html/rfc4566
+// http://en.wikipedia.org/wiki/Session_Description_Protocol
+
+
+class WebPeerConnectionHandler {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    virtual ~WebPeerConnectionHandler() { }
 
-    // Network -------------------------------------------------------------
+    virtual void initialize(const WebString& serverConfiguration, const WebString& username) { };
 
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
+    virtual void produceInitialOffer(const WebVector<WebMediaStreamDescriptor>& pendingAddStreams) = 0;
+    virtual void handleInitialOffer(const WebString& sdp) = 0;
+    virtual void processSDP(const WebString& sdp) = 0;
+    virtual void processPendingStreams(const WebVector<WebMediaStreamDescriptor>& pendingAddStreams, const WebVector<WebMediaStreamDescriptor>& pendingRemoveStreams) = 0;
+    virtual void sendDataStreamMessage(const char* data, size_t length) = 0;
 
-    // WebRTC ----------------------------------------------------------
-
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
-
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
-
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
-
-protected:
-    ~Platform() { }
+    virtual void stop() = 0;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebPeerConnectionHandler_h

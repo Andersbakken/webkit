@@ -28,51 +28,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
-
-#include "WebCommon.h"
+#ifndef WebMediaStreamCenterClient_h
+#define WebMediaStreamCenterClient_h
 
 namespace WebKit {
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
-class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
-class WebPeerConnectionHandlerClient;
-class WebURLLoader;
+class WebMediaStreamDescriptor;
 
-class Platform {
+class WebMediaStreamCenterClient {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    virtual ~WebMediaStreamCenterClient() { }
 
-    // Network -------------------------------------------------------------
-
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
-
-    // WebRTC ----------------------------------------------------------
-
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
-
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
-
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
-
-protected:
-    ~Platform() { }
+    virtual void stopLocalMediaStream(const WebMediaStreamDescriptor&) = 0;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebMediaStreamCenterClient_h

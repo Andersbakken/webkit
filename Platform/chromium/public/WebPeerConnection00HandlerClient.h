@@ -28,51 +28,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
-
-#include "WebCommon.h"
+#ifndef WebPeerConnection00HandlerClient_h
+#define WebPeerConnection00HandlerClient_h
 
 namespace WebKit {
+class WebICECandidateDescriptor;
+class WebMediaStreamDescriptor;
+class WebString;
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
-class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
-class WebPeerConnectionHandlerClient;
-class WebURLLoader;
-
-class Platform {
+class WebPeerConnection00HandlerClient {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    enum ReadyState {
+        ReadyStateNew = 0,
+        ReadyStateNegotiating = 1,
+        ReadyStateActive = 2,
+        ReadyStateClosed = 3
+    };
 
-    // Network -------------------------------------------------------------
+    enum ICEState {
+        ICEStateGathering = 0x100,
+        ICEStateWaiting = 0x200,
+        ICEStateChecking = 0x300,
+        ICEStateConnected = 0x400,
+        ICEStateCompleted = 0x500,
+        ICEStateFailed = 0x600,
+        ICEStateClosed = 0x700
+    };
 
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
+    virtual ~WebPeerConnection00HandlerClient() { }
 
-    // WebRTC ----------------------------------------------------------
-
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
-
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
-
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
-
-protected:
-    ~Platform() { }
+    virtual void didGenerateICECandidate(const WebICECandidateDescriptor&, bool moreToFollow) = 0;
+    virtual void didChangeReadyState(ReadyState) = 0;
+    virtual void didChangeICEState(ICEState) = 0;
+    virtual void didAddRemoteStream(const WebMediaStreamDescriptor&) = 0;
+    virtual void didRemoveRemoteStream(const WebMediaStreamDescriptor&) = 0;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebPeerConnection00HandlerClient_h

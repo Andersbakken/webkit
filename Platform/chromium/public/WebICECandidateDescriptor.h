@@ -28,51 +28,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
+#ifndef WebICECandidateDescriptor_h
+#define WebICECandidateDescriptor_h
 
 #include "WebCommon.h"
+#include "WebPrivatePtr.h"
+
+namespace WebCore {
+class IceCandidateDescriptor;
+}
 
 namespace WebKit {
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
-class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
-class WebPeerConnectionHandlerClient;
-class WebURLLoader;
+class WebString;
 
-class Platform {
+class WebICECandidateDescriptor {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    WebICECandidateDescriptor() { }
+    WebICECandidateDescriptor(const WebICECandidateDescriptor& other) { assign(other); }
+    ~WebICECandidateDescriptor() { reset(); }
 
-    // Network -------------------------------------------------------------
+    WebICECandidateDescriptor& operator=(const WebICECandidateDescriptor& other)
+    {
+        assign(other);
+        return *this;
+    }
 
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
+    WEBKIT_EXPORT void assign(const WebICECandidateDescriptor&);
 
-    // WebRTC ----------------------------------------------------------
+    WEBKIT_EXPORT void initialize(const WebString& label, const WebString& candidateLine);
+    WEBKIT_EXPORT void reset();
+    bool isNull() const { return m_private.isNull(); }
 
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
+    // The SDP m= line this candidate is associated with.
+    WEBKIT_EXPORT WebString label() const;
 
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
+    // The actual SDP candidate.
+    WEBKIT_EXPORT WebString candidateLine() const;
 
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
+#if WEBKIT_IMPLEMENTATION
+    WebICECandidateDescriptor(WebCore::IceCandidateDescriptor*);
+    WebICECandidateDescriptor(WTF::PassRefPtr<WebCore::IceCandidateDescriptor>);
 
-protected:
-    ~Platform() { }
+    operator WTF::PassRefPtr<WebCore::IceCandidateDescriptor>() const;
+#endif
+
+private:
+    WebPrivatePtr<WebCore::IceCandidateDescriptor> m_private;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebICECandidateDescriptor_h

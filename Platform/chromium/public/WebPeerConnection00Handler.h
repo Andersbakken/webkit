@@ -28,51 +28,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Platform_h
-#define Platform_h
+#ifndef WebPeerConnection00Handler_h
+#define WebPeerConnection00Handler_h
 
-#include "WebCommon.h"
+#include "WebString.h"
+#include "WebVector.h"
 
 namespace WebKit {
 
-class WebMediaStreamCenter;
-class WebMediaStreamCenterClient;
-class WebPeerConnection00Handler;
+class WebICECandidateDescriptor;
+class WebICEOptions;
 class WebPeerConnection00HandlerClient;
-class WebPeerConnectionHandler;
-class WebPeerConnectionHandlerClient;
-class WebURLLoader;
+class WebMediaHints;
+class WebMediaStreamDescriptor;
+class WebSessionDescriptionDescriptor;
 
-class Platform {
+class WebPeerConnection00Handler {
 public:
-    WEBKIT_EXPORT static void initialize(Platform*);
-    WEBKIT_EXPORT static void shutdown();
-    WEBKIT_EXPORT static Platform* current();
+    enum Action {
+        ActionSDPOffer = 0x100,
+        ActionSDPPRanswer = 0x200,
+        ActionSDPAnswer = 0x300
+    };
 
-    // Network -------------------------------------------------------------
+    virtual ~WebPeerConnection00Handler() { }
 
-    // Returns a new WebURLLoader instance.
-    virtual WebURLLoader* createURLLoader() { return 0; }
+    virtual void initialize(const WebString& serverConfiguration, const WebString& username) = 0;
 
-    // WebRTC ----------------------------------------------------------
+    virtual WebSessionDescriptionDescriptor createOffer(const WebMediaHints&) = 0;
+    virtual WebSessionDescriptionDescriptor createAnswer(const WebString& offer, const WebMediaHints&) = 0;
+    virtual bool setLocalDescription(Action, const WebSessionDescriptionDescriptor&) = 0;
+    virtual bool setRemoteDescription(Action, const WebSessionDescriptionDescriptor&) = 0;
+    virtual WebSessionDescriptionDescriptor localDescription() = 0;
+    virtual WebSessionDescriptionDescriptor remoteDescription() = 0;
+    virtual bool startIce(const WebICEOptions&) = 0;
+    virtual bool processIceMessage(const WebICECandidateDescriptor&) = 0;
+    virtual void addStream(const WebMediaStreamDescriptor&) = 0;
+    virtual void removeStream(const WebMediaStreamDescriptor&) = 0;
 
-    // DEPRECATED
-    // Creates an WebPeerConnectionHandler for DeprecatedPeerConnection.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnectionHandler* createPeerConnectionHandler(WebPeerConnectionHandlerClient*) { return 0; }
-
-    // Creates an WebPeerConnection00Handler for PeerConnection00.
-    // This is an highly experimental feature not yet in the WebRTC standard.
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebPeerConnection00Handler* createPeerConnection00Handler(WebPeerConnection00HandlerClient*) { return 0; }
-
-    // May return null if WebRTC functionality is not avaliable or out of resources.
-    virtual WebMediaStreamCenter* createMediaStreamCenter(WebMediaStreamCenterClient*) { return 0; }
-
-protected:
-    ~Platform() { }
+    virtual void stop() = 0;
 };
 
 } // namespace WebKit
 
-#endif
+#endif // WebPeerConnection00Handler_h
