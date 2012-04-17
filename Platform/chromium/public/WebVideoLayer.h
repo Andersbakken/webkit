@@ -23,46 +23,35 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebContentLayer_h
-#define WebContentLayer_h
+#ifndef WebVideoLayer_h
+#define WebVideoLayer_h
 
 #include "WebCommon.h"
 #include "WebLayer.h"
 
+namespace WebCore {
+class VideoLayerChromium;
+}
+
 namespace WebKit {
-class WebContentLayerClient;
-class WebContentLayerImpl;
-struct WebFloatRect;
 
-class WebContentLayer : public WebLayer {
+class WebVideoFrameProvider;
+
+class WebVideoLayer : public WebLayer {
 public:
-    WEBKIT_EXPORT static WebContentLayer create(WebContentLayerClient*);
+    WEBKIT_EXPORT static WebVideoLayer create(WebVideoFrameProvider*);
 
-    WebContentLayer() { }
-    WebContentLayer(const WebContentLayer& layer) : WebLayer(layer) { }
-    virtual ~WebContentLayer() { }
-    WebContentLayer& operator=(const WebContentLayer& layer)
-    {
-        WebLayer::assign(layer);
-        return *this;
-    }
+    WebVideoLayer() { }
+    virtual ~WebVideoLayer() { }
 
-    // Sets whether the layer draws its content when compositing.
-    WEBKIT_EXPORT void setDrawsContent(bool);
-    WEBKIT_EXPORT bool drawsContent() const;
-
-    // Sets a region of the layer as invalid, i.e. needs to update its content.
-    // The visible area of the dirty rect will be passed to one or more calls to
-    // WebContentLayerClient::paintContents before the compositing pass occurs.
-    WEBKIT_EXPORT void invalidateRect(const WebFloatRect&);
+    // Returns true if this layer is actively rendering (e.g. currently attached to a WebLayerTreeView).
+    WEBKIT_EXPORT bool active() const;
 
 #if WEBKIT_IMPLEMENTATION
-    WebContentLayer(const WTF::PassRefPtr<WebContentLayerImpl>&);
-    WebContentLayer& operator=(const WTF::PassRefPtr<WebContentLayerImpl>&);
-    operator WTF::PassRefPtr<WebContentLayerImpl>() const;
+    explicit WebVideoLayer(PassRefPtr<WebCore::VideoLayerChromium>);
 #endif
 };
 
 } // namespace WebKit
 
-#endif // WebContentLayer_h
+#endif // WebVideoLayer_h
