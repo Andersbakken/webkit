@@ -28,50 +28,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebPrerender_h
-#define WebPrerender_h
-
-#include "WebCommon.h"
-#include "WebPrivatePtr.h"
-#include "WebReferrerPolicy.h"
-#include "WebString.h"
-#include "WebURL.h"
-
-#if WEBKIT_IMPLEMENTATION
-#include <wtf/PassRefPtr.h>
-#endif
-
-namespace WebCore {
-class Prerender;
-}
+#include <public/WebPrerenderingSupport.h>
 
 namespace WebKit {
 
-class WebPrerender {
-public:
-    class ExtraData {
-    public:
-        virtual ~ExtraData() { }
-    };
+WebPrerenderingSupport* WebPrerenderingSupport::s_platform = 0;
 
-#if WEBKIT_IMPLEMENTATION
-    explicit WebPrerender(PassRefPtr<WebCore::Prerender>);
-    ~WebPrerender();
-#endif
+void WebPrerenderingSupport::initialize(WebPrerenderingSupport* platform)
+{
+    s_platform = platform;
+}
 
-    WEBKIT_EXPORT WebURL url() const;
-    WEBKIT_EXPORT WebString referrer() const;
-    WEBKIT_EXPORT WebReferrerPolicy referrerPolicy() const;
+void WebPrerenderingSupport::shutdown()
+{
+    s_platform = 0;
+}
 
-    WEBKIT_EXPORT void setExtraData(ExtraData*);
-    WEBKIT_EXPORT const ExtraData* extraData() const;
+WebPrerenderingSupport* WebPrerenderingSupport::current()
+{
+    return s_platform;
+}
 
-private:
-    WebPrerender();
-
-    WebPrivatePtr<WebCore::Prerender> m_private;
-};
-
-} // namespace WebKit
-
-#endif // WebPrerender_h
+}
