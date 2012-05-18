@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2012 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,27 +23,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#ifndef DFGCSEPhase_h
-#define DFGCSEPhase_h
+#ifndef DFGValidate_h
+#define DFGValidate_h
 
 #include <wtf/Platform.h>
 
 #if ENABLE(DFG_JIT)
 
+#include "DFGCommon.h"
+#include "DFGGraph.h"
+
 namespace JSC { namespace DFG {
 
-class Graph;
+enum GraphDumpMode { DontDumpGraph, DumpGraph };
 
-// Block-local common subexpression elimination. This is an optional phase, but
-// it is rather profitable. It has fairly accurate heap modeling and will match
-// a wide range of subexpression similarities. It's known to produce big wins
-// on a few benchmarks, and is relatively cheap to run.
-
-bool performCSE(Graph&);
+#if DFG_ENABLE(VALIDATION)
+void validate(Graph&, GraphDumpMode = DumpGraph);
+#else
+inline void validate(Graph&, GraphDumpMode = DumpGraph) { }
+#endif
 
 } } // namespace JSC::DFG
 
 #endif // ENABLE(DFG_JIT)
 
-#endif // DFGCSEPhase_h
+#endif // DFGPhase_h
 

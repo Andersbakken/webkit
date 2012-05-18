@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2012 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#ifndef DFGCSEPhase_h
-#define DFGCSEPhase_h
+#ifndef DFGCFGSimplificationPhase_h
+#define DFGCFGSimplificationPhase_h
 
 #include <wtf/Platform.h>
 
@@ -34,16 +34,19 @@ namespace JSC { namespace DFG {
 
 class Graph;
 
-// Block-local common subexpression elimination. This is an optional phase, but
-// it is rather profitable. It has fairly accurate heap modeling and will match
-// a wide range of subexpression similarities. It's known to produce big wins
-// on a few benchmarks, and is relatively cheap to run.
+// CFG simplification:
+//
+// jump to single predecessor -> merge blocks
+// branch on constant -> jump
+// branch to same blocks -> jump
+// jump-only block -> remove
+// kill dead code
 
-bool performCSE(Graph&);
+bool performCFGSimplification(Graph&);
 
 } } // namespace JSC::DFG
 
 #endif // ENABLE(DFG_JIT)
 
-#endif // DFGCSEPhase_h
+#endif // DFGCFGSimplificationPhase_h
 
