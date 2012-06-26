@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Google Inc. All rights reserved.
+ * Copyright (C) 2012 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,50 +23,36 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebContentLayer_h
-#define WebContentLayer_h
+#ifndef WebScrollableLayer_h
+#define WebScrollableLayer_h
 
 #include "WebCommon.h"
-#include "WebScrollableLayer.h"
-
-namespace WebCore {
-class ContentLayerChromium;
-}
+#include "WebLayer.h"
+#include "WebPoint.h"
 
 namespace WebKit {
-class WebContentLayerClient;
-class WebContentLayerImpl;
 
-class WebContentLayer : public WebScrollableLayer {
+class WebScrollableLayer : public WebLayer {
 public:
-    WEBKIT_EXPORT static WebContentLayer create(WebContentLayerClient*);
-
-    WebContentLayer() { }
-    WebContentLayer(const WebContentLayer& layer) : WebScrollableLayer(layer) { }
-    virtual ~WebContentLayer() { }
-    WebContentLayer& operator=(const WebContentLayer& layer)
+    WebScrollableLayer() { }
+    WebScrollableLayer(const WebScrollableLayer& layer) : WebLayer(layer) { }
+    virtual ~WebScrollableLayer() { }
+    WebScrollableLayer& operator=(const WebScrollableLayer& layer)
     {
         WebLayer::assign(layer);
         return *this;
     }
 
-    // Called when the WebContentLayerClient is going away and should not be used.
-    WEBKIT_EXPORT void clearClient();
-
-    // Set to true if the backside of this layer's contents should be visible when composited.
-    // Defaults to false.
-    WEBKIT_EXPORT void setDoubleSided(bool);
-
-    // Set to apply a scale factor used when painting and drawing this layer's content. Defaults to 1.0.
-    WEBKIT_EXPORT void setContentsScale(float);
+    WEBKIT_EXPORT void setScrollPosition(WebPoint);
+    WEBKIT_EXPORT void setScrollable(bool);
+    WEBKIT_EXPORT void setHaveWheelEventHandlers(bool);
+    WEBKIT_EXPORT void setShouldScrollOnMainThread(bool);
 
 #if WEBKIT_IMPLEMENTATION
-    WebContentLayer(const WTF::PassRefPtr<WebCore::ContentLayerChromium>&);
-    WebContentLayer& operator=(const WTF::PassRefPtr<WebCore::ContentLayerChromium>&);
-    operator WTF::PassRefPtr<WebCore::ContentLayerChromium>() const;
+    WebScrollableLayer(const WTF::PassRefPtr<WebCore::LayerChromium>& layer) : WebLayer(layer) { }
 #endif
 };
 
 } // namespace WebKit
 
-#endif // WebContentLayer_h
+#endif // WebScrollableLayer_h
