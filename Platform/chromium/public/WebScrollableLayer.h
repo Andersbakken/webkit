@@ -23,41 +23,42 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebScrollbarLayer_h
-#define WebScrollbarLayer_h
+#ifndef WebScrollableLayer_h
+#define WebScrollableLayer_h
 
+#include "WebCommon.h"
 #include "WebLayer.h"
-#include "WebScrollbarThemeGeometry.h"
-#include "WebScrollbarThemePainter.h"
-
-namespace WebCore {
-class Scrollbar;
-class ScrollbarLayerChromium;
-}
+#include "WebPoint.h"
+#include "WebRect.h"
+#include "WebVector.h"
 
 namespace WebKit {
 
-class WebScrollbarLayer : public WebLayer {
+class WebScrollableLayer : public WebLayer {
 public:
-    WebScrollbarLayer() { }
-    WebScrollbarLayer(const WebScrollbarLayer& layer) : WebLayer(layer) { }
-    virtual ~WebScrollbarLayer() { }
-    WebScrollbarLayer& operator=(const WebScrollbarLayer& layer)
+    WebScrollableLayer() { }
+    WebScrollableLayer(const WebScrollableLayer& layer) : WebLayer(layer) { }
+    virtual ~WebScrollableLayer() { }
+    WebScrollableLayer& operator=(const WebScrollableLayer& layer)
     {
         WebLayer::assign(layer);
         return *this;
     }
 
-    WEBKIT_EXPORT void setScrollLayer(const WebLayer);
+    WEBKIT_EXPORT void setScrollPosition(WebPoint);
+    WEBKIT_EXPORT void setScrollable(bool);
+    WEBKIT_EXPORT void setHaveWheelEventHandlers(bool);
+    WEBKIT_EXPORT void setShouldScrollOnMainThread(bool);
+    WEBKIT_EXPORT void setNonFastScrollableRegion(const WebVector<WebRect>&);
+    WEBKIT_EXPORT void setIsContainerForFixedPositionLayers(bool);
+    WEBKIT_EXPORT void setFixedToContainerLayer(bool);
+
 
 #if WEBKIT_IMPLEMENTATION
-    static WebScrollbarLayer create(WebCore::Scrollbar*, WebScrollbarThemePainter, PassOwnPtr<WebScrollbarThemeGeometry>);
-    explicit WebScrollbarLayer(const WTF::PassRefPtr<WebCore::ScrollbarLayerChromium>&);
-    WebScrollbarLayer& operator=(const WTF::PassRefPtr<WebCore::ScrollbarLayerChromium>&);
-    operator WTF::PassRefPtr<WebCore::ScrollbarLayerChromium>() const;
+    WebScrollableLayer(const WTF::PassRefPtr<WebCore::LayerChromium>& layer) : WebLayer(layer) { }
 #endif
 };
 
 } // namespace WebKit
 
-#endif // WebScrollbarLayer_h
+#endif // WebScrollableLayer_h
