@@ -28,22 +28,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebRTCPeerConnectionHandler_h
-#define WebRTCPeerConnectionHandler_h
+#ifndef WebMediaConstraints_h
+#define WebMediaConstraints_h
+
+#include "WebCommon.h"
+#include "WebNonCopyable.h"
+#include "WebPrivatePtr.h"
+#include "WebString.h"
+#include "WebVector.h"
+
+namespace WebCore {
+class MediaConstraints;
+}
 
 namespace WebKit {
-class WebMediaConstraints;
-class WebRTCConfiguration;
-class WebRTCPeerConnectionHandlerClient;
 
-class WebRTCPeerConnectionHandler {
+class WebMediaConstraints {
 public:
-    virtual ~WebRTCPeerConnectionHandler() { }
+    WebMediaConstraints() { }
+    WebMediaConstraints(const WebMediaConstraints& other) { assign(other); }
+    ~WebMediaConstraints() { reset(); }
 
-    virtual bool initialize(const WebRTCConfiguration&, const WebMediaConstraints&) = 0;
-    virtual void stop() = 0;
+    WebMediaConstraints& operator=(const WebMediaConstraints& other)
+    {
+        assign(other);
+        return *this;
+    }
+
+    WEBKIT_EXPORT void assign(const WebMediaConstraints&);
+
+    WEBKIT_EXPORT void reset();
+    bool isNull() const;
+
+    WEBKIT_EXPORT void getMandatoryConstraintNames(WebVector<WebString>& names) const;
+    WEBKIT_EXPORT void getOptionalConstraintNames(WebVector<WebString>& names) const;
+
+    WEBKIT_EXPORT bool getMandatoryConstraintValue(const WebString& name, WebString& value) const;
+    WEBKIT_EXPORT bool getOptionalConstraintValue(const WebString& name, WebString& value) const;
+
+#if WEBKIT_IMPLEMENTATION
+    WebMediaConstraints(const WTF::PassRefPtr<WebCore::MediaConstraints>&);
+#endif
+
+private:
+    WebPrivatePtr<WebCore::MediaConstraints> m_private;
 };
 
 } // namespace WebKit
 
-#endif // WebRTCPeerConnectionHandler_h
+#endif // WebMediaConstraints_h
