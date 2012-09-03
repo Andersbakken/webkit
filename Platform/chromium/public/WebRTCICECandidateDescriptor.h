@@ -28,43 +28,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebRTCPeerConnectionHandlerClient_h
-#define WebRTCPeerConnectionHandlerClient_h
+#ifndef WebRTCICECandidateDescriptor_h
+#define WebRTCICECandidateDescriptor_h
+
+#include "WebCommon.h"
+#include "WebPrivatePtr.h"
+
+namespace WebCore {
+class RTCIceCandidateDescriptor;
+}
 
 namespace WebKit {
-class WebMediaStreamDescriptor;
-class WebRTCICECandidateDescriptor;
 
-class WebRTCPeerConnectionHandlerClient {
+class WebString;
+
+class WebRTCICECandidateDescriptor {
 public:
-    enum ReadyState {
-        ReadyStateNew = 1,
-        ReadyStateOpening = 2,
-        ReadyStateActive = 3,
-        ReadyStateClosing = 4,
-        ReadyStateClosed = 5
-    };
+    WebRTCICECandidateDescriptor() { }
+    WebRTCICECandidateDescriptor(const WebRTCICECandidateDescriptor& other) { assign(other); }
+    ~WebRTCICECandidateDescriptor() { reset(); }
 
-    enum ICEState {
-        ICEStateNew = 1,
-        ICEStateGathering = 2,
-        ICEStateWaiting = 3,
-        ICEStateChecking = 4,
-        ICEStateConnected = 5,
-        ICEStateCompleted = 6,
-        ICEStateFailed = 7,
-        ICEStateClosed = 8
-    };
+    WebRTCICECandidateDescriptor& operator=(const WebRTCICECandidateDescriptor& other)
+    {
+        assign(other);
+        return *this;
+    }
 
-    virtual ~WebRTCPeerConnectionHandlerClient() { }
+    WEBKIT_EXPORT void assign(const WebRTCICECandidateDescriptor&);
 
-    virtual void didGenerateICECandidate(const WebRTCICECandidateDescriptor&) = 0;
-    virtual void didChangeReadyState(ReadyState) = 0;
-    virtual void didChangeICEState(ICEState) = 0;
-    virtual void didAddRemoteStream(const WebMediaStreamDescriptor&) = 0;
-    virtual void didRemoveRemoteStream(const WebMediaStreamDescriptor&) = 0;
+    WEBKIT_EXPORT void initialize(const WebString& candidate, const WebString& sdpMid, unsigned short sdpMLineIndex);
+    WEBKIT_EXPORT void reset();
+    bool isNull() const { return m_private.isNull(); }
+
+    WEBKIT_EXPORT WebString candidate() const;
+    WEBKIT_EXPORT WebString sdpMid() const;
+    WEBKIT_EXPORT unsigned short sdpMLineIndex() const;
+
+#if WEBKIT_IMPLEMENTATION
+    WebRTCICECandidateDescriptor(WebCore::RTCIceCandidateDescriptor*);
+    WebRTCICECandidateDescriptor(WTF::PassRefPtr<WebCore::RTCIceCandidateDescriptor>);
+
+    operator WTF::PassRefPtr<WebCore::RTCIceCandidateDescriptor>() const;
+#endif
+
+private:
+    WebPrivatePtr<WebCore::RTCIceCandidateDescriptor> m_private;
 };
 
 } // namespace WebKit
 
-#endif // WebRTCPeerConnectionHandlerClient_h
+#endif // WebRTCICECandidateDescriptor_h
