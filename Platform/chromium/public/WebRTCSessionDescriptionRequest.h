@@ -28,32 +28,61 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebRTCPeerConnectionHandler_h
-#define WebRTCPeerConnectionHandler_h
+#ifndef WebRTCSessionDescriptionRequest_h
+#define WebRTCSessionDescriptionRequest_h
+
+#include "WebCommon.h"
+#include "WebNonCopyable.h"
+#include "WebPrivatePtr.h"
+#include "WebString.h"
+
+namespace WebCore {
+class RTCSessionDescriptionRequest;
+}
 
 namespace WebKit {
-class WebMediaConstraints;
-class WebMediaStreamDescriptor;
-class WebRTCConfiguration;
-class WebRTCICECandidateDescriptor;
-class WebRTCPeerConnectionHandlerClient;
 class WebRTCSessionDescriptionDescriptor;
-class WebRTCSessionDescriptionRequest;
 
-class WebRTCPeerConnectionHandler {
+class WebRTCSessionDescriptionRequest {
 public:
-    virtual ~WebRTCPeerConnectionHandler() { }
+    class ExtraData {
+    public:
+        virtual ~ExtraData() { }
+    };
 
-    virtual bool initialize(const WebRTCConfiguration&, const WebMediaConstraints&) = 0;
+    WebRTCSessionDescriptionRequest() { }
+    WebRTCSessionDescriptionRequest(const WebRTCSessionDescriptionRequest& other) { assign(other); }
+    ~WebRTCSessionDescriptionRequest() { reset(); }
 
-    virtual void createOffer(const WebRTCSessionDescriptionRequest&, const WebMediaConstraints&) = 0;
-    virtual bool updateICE(const WebRTCConfiguration&, const WebMediaConstraints&) = 0;
-    virtual bool addICECandidate(const WebRTCICECandidateDescriptor&) = 0;
-    virtual bool addStream(const WebMediaStreamDescriptor&, const WebMediaConstraints&) = 0;
-    virtual void removeStream(const WebMediaStreamDescriptor&) = 0;
-    virtual void stop() = 0;
+    WebRTCSessionDescriptionRequest& operator=(const WebRTCSessionDescriptionRequest& other)
+    {
+        assign(other);
+        return *this;
+    }
+
+    WEBKIT_EXPORT void assign(const WebRTCSessionDescriptionRequest&);
+
+    WEBKIT_EXPORT void reset();
+    bool isNull() const { return m_private.isNull(); }
+
+    WEBKIT_EXPORT void requestSucceeded(const WebRTCSessionDescriptionDescriptor&) const;
+    WEBKIT_EXPORT void requestFailed(const WebString& error) const;
+
+    // Extra data associated with this object.
+    // If non-null, the extra data pointer will be deleted when the object is destroyed.
+    // Setting the extra data pointer will cause any existing non-null
+    // extra data pointer to be deleted.
+    WEBKIT_EXPORT ExtraData* extraData() const;
+    WEBKIT_EXPORT void setExtraData(ExtraData*);
+
+#if WEBKIT_IMPLEMENTATION
+    WebRTCSessionDescriptionRequest(const WTF::PassRefPtr<WebCore::RTCSessionDescriptionRequest>&);
+#endif
+
+private:
+    WebPrivatePtr<WebCore::RTCSessionDescriptionRequest> m_private;
 };
 
 } // namespace WebKit
 
-#endif // WebRTCPeerConnectionHandler_h
+#endif // WebRTCSessionDescriptionRequest_h
