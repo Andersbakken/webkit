@@ -28,66 +28,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebRTCSessionDescriptionDescriptor_h
-#define WebRTCSessionDescriptionDescriptor_h
+#ifndef WebRTCICECandidate_h
+#define WebRTCICECandidate_h
 
 #include "WebCommon.h"
-#include "WebNonCopyable.h"
 #include "WebPrivatePtr.h"
 
 namespace WebCore {
-class RTCSessionDescriptionDescriptor;
+class RTCIceCandidateDescriptor;
 }
 
 namespace WebKit {
+
 class WebString;
 
-//  In order to establish the media plane, PeerConnection needs specific
-//  parameters to indicate what to transmit to the remote side, as well
-//  as how to handle the media that is received. These parameters are
-//  determined by the exchange of session descriptions in offers and
-//  answers, and there are certain details to this process that must be
-//  handled in the JSEP APIs.
-//
-//  Whether a session description was sent or received affects the
-//  meaning of that description. For example, the list of codecs sent to
-//  a remote party indicates what the local side is willing to decode,
-//  and what the remote party should send.
-
-// FIXME: Invent less convoluted name.
-class WebRTCSessionDescriptionDescriptor {
+class WebRTCICECandidate {
 public:
-    WebRTCSessionDescriptionDescriptor() { }
-    WebRTCSessionDescriptionDescriptor(const WebRTCSessionDescriptionDescriptor& other) { assign(other); }
-    ~WebRTCSessionDescriptionDescriptor() { reset(); }
+    WebRTCICECandidate() { }
+    WebRTCICECandidate(const WebRTCICECandidate& other) { assign(other); }
+    ~WebRTCICECandidate() { reset(); }
 
-    WebRTCSessionDescriptionDescriptor& operator=(const WebRTCSessionDescriptionDescriptor& other)
+    WebRTCICECandidate& operator=(const WebRTCICECandidate& other)
     {
         assign(other);
         return *this;
     }
 
-    WEBKIT_EXPORT void assign(const WebRTCSessionDescriptionDescriptor&);
+    WEBKIT_EXPORT void assign(const WebRTCICECandidate&);
 
-    WEBKIT_EXPORT void initialize(const WebString& type, const WebString& sdp);
+    WEBKIT_EXPORT void initialize(const WebString& candidate, const WebString& sdpMid, unsigned short sdpMLineIndex);
     WEBKIT_EXPORT void reset();
     bool isNull() const { return m_private.isNull(); }
 
-    WEBKIT_EXPORT WebString type() const;
-    WEBKIT_EXPORT void setType(const WebString&);
-    WEBKIT_EXPORT WebString sdp() const;
-    WEBKIT_EXPORT void setSDP(const WebString&);
+    WEBKIT_EXPORT WebString candidate() const;
+    WEBKIT_EXPORT WebString sdpMid() const;
+    WEBKIT_EXPORT unsigned short sdpMLineIndex() const;
 
 #if WEBKIT_IMPLEMENTATION
-    WebRTCSessionDescriptionDescriptor(const WTF::PassRefPtr<WebCore::RTCSessionDescriptionDescriptor>&);
+    WebRTCICECandidate(WebCore::RTCIceCandidateDescriptor*);
+    WebRTCICECandidate(WTF::PassRefPtr<WebCore::RTCIceCandidateDescriptor>);
 
-    operator WTF::PassRefPtr<WebCore::RTCSessionDescriptionDescriptor>() const;
+    operator WTF::PassRefPtr<WebCore::RTCIceCandidateDescriptor>() const;
 #endif
 
 private:
-    WebPrivatePtr<WebCore::RTCSessionDescriptionDescriptor> m_private;
+    WebPrivatePtr<WebCore::RTCIceCandidateDescriptor> m_private;
 };
 
 } // namespace WebKit
 
-#endif // WebRTCSessionDescriptionDescriptor_h
+#endif // WebRTCICECandidate_h
