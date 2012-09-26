@@ -28,23 +28,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MemoryInstrumentationVector_h
-#define MemoryInstrumentationVector_h
+#ifndef MemoryInstrumentationHashSet_h
+#define MemoryInstrumentationHashSet_h
 
-#include <wtf/MemoryInstrumentation.h>
-#include <wtf/Vector.h>
+#include <wtf/MemoryInstrumentationHashTable.h>
+#include <wtf/text/StringHash.h>
 
 namespace WTF {
 
-template<typename T, size_t inlineCapacity>
-void reportMemoryUsage(const Vector<T, inlineCapacity>* const& vector, MemoryObjectInfo* memoryObjectInfo)
+template<typename ValueArg, typename HashArg, typename TraitsArg>
+void reportMemoryUsage(const HashSet<ValueArg, HashArg, TraitsArg>* const& hashSet, MemoryObjectInfo* memoryObjectInfo)
 {
-    MemoryClassInfo info(memoryObjectInfo, vector);
-    if (inlineCapacity < vector->capacity())
-        info.addRawBuffer(vector->data(), vector->capacity() * sizeof(T));
-    info.addCollectionElements(vector->begin(), vector->end());
+    MemoryClassInfo info(memoryObjectInfo, hashSet);
+    info.addMember(hashSet->m_impl);
+    info.addCollectionElements(hashSet->begin(), hashSet->end());
 }
 
 }
 
-#endif // !defined(MemoryInstrumentationVector_h)
+#endif // !defined(MemoryInstrumentationHashSet_h)
