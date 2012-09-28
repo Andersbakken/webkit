@@ -28,41 +28,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebRTCPeerConnectionHandler_h
-#define WebRTCPeerConnectionHandler_h
+#ifndef WebRTCStatsRequest_h
+#define WebRTCStatsRequest_h
+
+#include "WebCommon.h"
+#include "WebPrivatePtr.h"
+#include "WebString.h"
+
+namespace WebCore {
+class RTCStatsRequest;
+}
 
 namespace WebKit {
-class WebMediaConstraints;
-class WebMediaStreamDescriptor;
-class WebRTCConfiguration;
-class WebRTCICECandidate;
-class WebRTCPeerConnectionHandlerClient;
-class WebRTCSessionDescription;
-class WebRTCSessionDescriptionRequest;
-class WebRTCStatsRequest;
-class WebRTCVoidRequest;
 
-class WebRTCPeerConnectionHandler {
+class WebRTCStatsRequest {
 public:
-    virtual ~WebRTCPeerConnectionHandler() { }
+    WebRTCStatsRequest() { }
+    WebRTCStatsRequest(const WebRTCStatsRequest& other) { assign(other); }
+    ~WebRTCStatsRequest() { reset(); }
 
-    virtual bool initialize(const WebRTCConfiguration&, const WebMediaConstraints&) = 0;
+    WebRTCStatsRequest& operator=(const WebRTCStatsRequest& other)
+    {
+        assign(other);
+        return *this;
+    }
 
-    virtual void createOffer(const WebRTCSessionDescriptionRequest&, const WebMediaConstraints&) = 0;
-    virtual void createAnswer(const WebRTCSessionDescriptionRequest&, const WebMediaConstraints&) = 0;
-    virtual void setLocalDescription(const WebRTCVoidRequest&, const WebRTCSessionDescription&) = 0;
-    virtual void setRemoteDescription(const WebRTCVoidRequest&, const WebRTCSessionDescription&) = 0;
-    virtual WebRTCSessionDescription localDescription() = 0;
-    virtual WebRTCSessionDescription remoteDescription() = 0;
-    virtual bool updateICE(const WebRTCConfiguration&, const WebMediaConstraints&) = 0;
-    virtual bool addICECandidate(const WebRTCICECandidate&) = 0;
-    virtual bool addStream(const WebMediaStreamDescriptor&, const WebMediaConstraints&) = 0;
-    virtual void removeStream(const WebMediaStreamDescriptor&) = 0;
-    // FIXME: Remove default implementation when clients have changed.
-    virtual void getStats(const WebRTCStatsRequest&) { }
-    virtual void stop() = 0;
+    WEBKIT_EXPORT void assign(const WebRTCStatsRequest&);
+
+    WEBKIT_EXPORT void reset();
+
+    WEBKIT_EXPORT void requestSucceeded() const;
+
+#if WEBKIT_IMPLEMENTATION
+    WebRTCStatsRequest(const WTF::PassRefPtr<WebCore::RTCStatsRequest>&);
+#endif
+
+private:
+    WebPrivatePtr<WebCore::RTCStatsRequest> m_private;
 };
 
 } // namespace WebKit
 
-#endif // WebRTCPeerConnectionHandler_h
+#endif // WebRTCStatsRequest_h
